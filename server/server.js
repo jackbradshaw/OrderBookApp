@@ -14,24 +14,31 @@ var app = connect();
 app.use(serveStatic("app"));
 
 app.use(connectRoute(function(router) {
-	router.get("/order", function(request, response) {
-		var query = parseQuery(request);
-		var body;
-		if(query.direction) {
-			if(query.direction === "1") {
-				body = JSON.stringify(orderBook.buyOrders);
-			} else if(query.direction === "-1") {
-				body = JSON.stringify(orderBook.sellOrders);
-			}
-		}
-		if(!body) {
-			body = JSON.stringify(orderBook.buyOrders.concat(orderBook.sellOrders));
-		}
-		response.end(body);
-	});
-}))
+	router.get("/order", getOrders);
+	router.get("/trade", getTrades);
+}));
 app.listen(8000);
 
 function parseQuery(request) {
 	return url.parse(request.url, true).query;
+}
+
+function getOrders(request, response) {
+	var query = parseQuery(request);
+	var body;
+	if(query.direction) {
+		if(query.direction === "1") {
+			body = JSON.stringify(orderBook.buyOrders);
+		} else if(query.direction === "-1") {
+			body = JSON.stringify(orderBook.sellOrders);
+		}
+	}
+	if(!body) {
+		body = JSON.stringify(orderBook.buyOrders.concat(orderBook.sellOrders));
+	}
+	response.end(body);
+}
+
+function getTrades(request, response) {
+	response.end(JSON.stringify(orderBook.trades));
 }

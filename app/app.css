@@ -28,3 +28,8 @@
   content: "";
   padding: 0;
 }
+
+.orderList {
+	float: left;
+	width: 300px;
+}
