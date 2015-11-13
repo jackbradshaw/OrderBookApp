@@ -4,10 +4,12 @@ var SELL_ORDER_DIRECTION = -1;
 var BUY_ORDER_DIRECTION = 1;
 var LIMIT_ORDER_TYPE = 1;
 
-var OrderBook = function OrderBook() {
+var OrderBook = function OrderBook(orderPlaced, tradeMade) {
 	this.buyOrders = [];
 	this.sellOrders = [];
 	this.trades = [];
+	this.orderPlaced = orderPlaced;
+	this.tradeMade = tradeMade;
 };
 
 OrderBook.prototype.placeOrder = function(order) {
@@ -35,6 +37,7 @@ OrderBook.prototype.placeOrder = function(order) {
 	if(order.size !== 0) {
 		orders.push(order);
 		orders.sort(this.sort);
+		this.orderPlaced && this.orderPlaced(order);
 	}
 };
 
@@ -65,7 +68,7 @@ OrderBook.prototype.trade = function(order, passiveOrder) {
 	passiveOrder.size -= size;
 	var trade = new Trade(passiveOrder.price, size);
 	this.trades.push(trade);
-	console.log(trade);
+	this.tradeMade && this.tradeMade(trade);
 }
 
 module.exports = OrderBook;

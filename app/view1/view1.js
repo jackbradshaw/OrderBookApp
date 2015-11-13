@@ -12,10 +12,17 @@ angular.module("myApp.view1", ["ngRoute"])
 
 .controller("View1Ctrl", (function() {
 	var Controller =  function Controller($scope, $http) {
+		this.$scope = $scope;
+
 		var baseUrl = "./";
 		$http.get(baseUrl + "order?direction=1").then(this.getBuyOrders.bind(this));
 		$http.get(baseUrl + "order?direction=-1").then(this.getSellOrders.bind(this));
 		$http.get(baseUrl + "trade").then(this.getTrades.bind(this));
+
+		this.socket = io("localhost:8000");
+		this.socket.on("connect", this.connect.bind(this));
+		this.socket.on("trade", this.trade.bind(this));
+		this.socket.on("order", this.order.bind(this));
 	};
 
 	Controller.$inject = ["$scope", "$http"];
@@ -30,6 +37,28 @@ angular.module("myApp.view1", ["ngRoute"])
 
 	Controller.prototype.getTrades = function(result) {
 		this.trades = result.data;
+	}
+
+	Controller.prototype.connect = function() {
+		console.log("connect");
+	}
+
+	Controller.prototype.trade = function(trade) {
+		this.$scope.$apply((function() {
+			trade = JSON.parse(trade);
+			this.trades && this.trades.push(trade);
+		}).bind(this));
+	}
+
+	Controller.prototype.order = function(order) {
+		this.$scope.$apply((function() {
+			order = JSON.parse(order);
+			if(order.direction === 1) {
+				this.buyOrders && this.buyOrders.push(order);
+			} else if(order.direction === -1) {
+				this.sellOrders && this.sellOrders.push(order);
+			}
+		}).bind(this));
 	}
 
 	return Controller;
