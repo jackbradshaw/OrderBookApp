@@ -7,7 +7,7 @@ var OrderPlacer = function OrderPlacer(orderBook, orderFile) {
 		encoding: "utf-8"
 	})
 		.split("\n")
-		.slice(0, 1000)
+	//	.slice(0, 1000)
 		.map(function(line) {
 			var messageItems = line.split(",");
 

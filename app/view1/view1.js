@@ -22,21 +22,25 @@ angular.module("myApp.view1", ["ngRoute"])
 		this.socket = io("localhost:8000");
 		this.socket.on("connect", this.connect.bind(this));
 		this.socket.on("trade", this.trade.bind(this));
-		this.socket.on("order", this.order.bind(this));
+		this.socket.on("orderChanged", this.orderChanged.bind(this));
 	};
 
 	Controller.$inject = ["$scope", "$http"];
 
 	Controller.prototype.getBuyOrders = function(result) {
-		this.buyOrders = result.data;
+		this.buyOrders = new SortedList(result.data, this.getOrderComparison(true));
 	}
 
 	Controller.prototype.getSellOrders = function(result) {
-		this.sellOrders = result.data;
+		this.sellOrders = new SortedList(result.data, this.getOrderComparison(false));
 	}
 
 	Controller.prototype.getTrades = function(result) {
 		this.trades = result.data;
+	}
+
+	Controller.prototype.placeOrder = function() {
+		console.log("place");
 	}
 
 	Controller.prototype.connect = function() {
@@ -46,20 +50,41 @@ angular.module("myApp.view1", ["ngRoute"])
 	Controller.prototype.trade = function(trade) {
 		this.$scope.$apply((function() {
 			trade = JSON.parse(trade);
-			this.trades && this.trades.push(trade);
+			this.trades && this.trades.unshift(trade);
 		}).bind(this));
 	}
 
-	Controller.prototype.order = function(order) {
+	Controller.prototype.orderChanged = function(order) {
 		this.$scope.$apply((function() {
+			var orderList;
 			order = JSON.parse(order);
 			if(order.direction === 1) {
-				this.buyOrders && this.buyOrders.push(order);
+				orderList = this.buyOrders;
 			} else if(order.direction === -1) {
-				this.sellOrders && this.sellOrders.push(order);
+				orderList = this.sellOrders;
+			}
+			if(orderList) {
+				if(order.size === 0) {
+					orderList.remove(order);
+				} else {
+					orderList.insert(order);
+				}
 			}
 		}).bind(this));
 	}
+
+	Controller.prototype.getOrderComparison = function(buy) {
+		return function(order1, order2) {
+			var result;
+			if(buy) {
+				result = order1.price - order2.price;
+			} else {
+				result = order2.price - order1.price;
+			}
+			return -(result || order1.time - order2.time);
+		};
+	}
+
 
 	return Controller;
 })())

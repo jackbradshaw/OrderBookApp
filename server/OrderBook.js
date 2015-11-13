@@ -4,11 +4,11 @@ var SELL_ORDER_DIRECTION = -1;
 var BUY_ORDER_DIRECTION = 1;
 var LIMIT_ORDER_TYPE = 1;
 
-var OrderBook = function OrderBook(orderPlaced, tradeMade) {
+var OrderBook = function OrderBook(orderChanged, tradeMade) {
 	this.buyOrders = [];
 	this.sellOrders = [];
 	this.trades = [];
-	this.orderPlaced = orderPlaced;
+	this.orderChanged = orderChanged;
 	this.tradeMade = tradeMade;
 };
 
@@ -29,6 +29,7 @@ OrderBook.prototype.placeOrder = function(order) {
 	if(passiveOrders) {
 		while(order.size > 0 && passiveOrders.length > 0 && this.matches(order, passiveOrders[0])) {
 			this.trade(order, passiveOrders[0]);
+			this.orderChanged(passiveOrders[0]);
 			if(passiveOrders[0].size === 0) {
 				passiveOrders.shift();
 			}
@@ -37,8 +38,8 @@ OrderBook.prototype.placeOrder = function(order) {
 	if(order.size !== 0) {
 		orders.push(order);
 		orders.sort(this.sort);
-		this.orderPlaced && this.orderPlaced(order);
 	}
+	this.orderChanged && this.orderChanged(order);
 };
 
 OrderBook.prototype.sort  = function(order1, order2) {

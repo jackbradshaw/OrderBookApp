@@ -1,8 +1,8 @@
 <div class="orderList">
-	<div>{{title}} ({{orders.length}})</div>
+	<h3>{{title}} ({{orders.length}})</h3>
 	<div ng-repeat="order in orders">
 		<div>
-			{{order.price}} {{order.size}}
+			{{order.price | number}} {{order.size | number}}
 		</div>
 	</div>
 </div>

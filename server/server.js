@@ -8,7 +8,7 @@ var socketIo = require("socket.io");
 var OrderBook = require("./OrderBook");
 var OrderPlacer = require("./OrderPlacer");
 
-var orderBook = new OrderBook(orderPlaced, tradeMade);
+var orderBook = new OrderBook(orderChanged, tradeMade);
 var orderPlacer = new OrderPlacer(orderBook, "./server/messages.csv");
 
 var app = connect();
@@ -53,8 +53,8 @@ function getTrades(request, response) {
 	response.end(JSON.stringify(orderBook.trades));
 }
 
-function orderPlaced(order) {
-	io.emit("order", JSON.stringify(order));
+function orderChanged(order) {
+	io.emit("orderChanged", JSON.stringify(order));
 }
 
 function tradeMade(trade) {
