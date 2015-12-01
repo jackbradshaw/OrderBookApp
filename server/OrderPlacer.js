@@ -7,7 +7,6 @@ var OrderPlacer = function OrderPlacer(orderBook, orderFile) {
 		encoding: "utf-8"
 	})
 		.split("\n")
-	//	.slice(0, 1000)
 		.map(function(line) {
 			var messageItems = line.split(",");
 
@@ -24,14 +23,14 @@ var OrderPlacer = function OrderPlacer(orderBook, orderFile) {
 };
 
 OrderPlacer.prototype.scheduleOrder = function(time) {
-	setTimeout(this.timeout.bind(this), time || 0, this);
+	setTimeout(this.timeout.bind(this), time * 100 || 0);
 }
 
 OrderPlacer.prototype.timeout = function() {
 	var order = this.orders.shift();
 	if(order) {
 		this.orderBook.placeOrder(order);
-		var nextOrder = this.orders[this.orders.length - 1];
+		var nextOrder = this.orders[0];
 		nextOrder && this.scheduleOrder(nextOrder.time - order.time);
 	}
 }

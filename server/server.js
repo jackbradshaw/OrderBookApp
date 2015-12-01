@@ -1,5 +1,5 @@
 var http = require("http");
-var serveStatic = require('serve-static');
+var serveStatic = require("serve-static");
 var connect = require("connect");
 var connectRoute = require("connect-route");
 var url = require("url");
@@ -22,9 +22,9 @@ app.use(connectRoute(function(router) {
 
 var server = http.createServer(app);
 var io = socketIo(server);
-io.on('connection', function(socket){
-  socket.on('event', function(data){});
-  socket.on('disconnect', function(){});
+io.on("connection", function(socket){
+  socket.on("event", function(data){});
+  socket.on("disconnect", function(){});
 });
 
 server.listen(8000);
